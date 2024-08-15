@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smoke Detection</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-control {
+            border-radius: 0.25rem;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .result {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .result span {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Smoke Detection System</h2>
+        <form id="predictionForm">
+            <div class="form-group">
+                <label for="temperature">Temperature (°C)</label>
+                <input type="number" class="form-control" id="temperature" name="Temperature[C]" step="any" required>
+            </div>
+            <div class="form-group">
+                <label for="humidity">Humidity (%)</label>
+                <input type="number" class="form-control" id="humidity" name="Humidity[%]" step="any" required>
+            </div>
+            <div class="form-group">
+                <label for="tvoc">TVOC (ppb)</label>
+                <input type="number" class="form-control" id="tvoc" name="TVOC[ppb]" required>
+            </div>
+            <div class="form-group">
+                <label for="eco2">eCO2 (ppm)</label>
+                <input type="number" class="form-control" id="eco2" name="eCO2[ppm]" required>
+            </div>
+            <div class="form-group">
+                <label for="rawH2">Raw H2</label>
+                <input type="number" class="form-control" id="rawH2" name="Raw H2" required>
+            </div>
+            <div class="form-group">
+                <label for="rawEthanol">Raw Ethanol</label>
+                <input type="number" class="form-control" id="rawEthanol" name="Raw Ethanol" required>
+            </div>
+            <div class="form-group">
+                <label for="pressure">Pressure (hPa)</label>
+                <input type="number" class="form-control" id="pressure" name="Pressure[hPa]" step="any" required>
+            </div>
+            <div class="form-group">
+                <label for="pm1">PM1.0</label>
+                <input type="number" class="form-control" id="pm1" name="PM1.0" step="any" required>
+            </div>
+            <div class="form-group">
+                <label for="pm2">PM2.5</label>
+                <input type="number" class="form-control" id="pm2" name="PM2.5" step="any" required>
+            </div>
+            <div class="form-group">
+                <label for="nc05">NC0.5</label>
+                <input type="number" class="form-control" id="nc05" name="NC0.5" step="any" required>
+            </div>
+            <div class="form-group">
+                <label for="nc10">NC1.0</label>
+                <input type="number" class="form-control" id="nc10" name="NC1.0" step="any" required>
+            </div>
+            <div class="form-group">
+                <label for="nc25">NC2.5</label>
+                <input type="number" class="form-control" id="nc25" name="NC2.5" step="any" required>
+            </div>
+            <div class="form-group">
+                <label for="cnt">CNT</label>
+                <input type="number" class="form-control" id="cnt" name="CNT" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Predict</button>
+        </form>
+        <div class="result" id="result" style="display: none;">
+            <p>Prediction: <span id="prediction"></span></p>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            var formData = new FormData(this);
+            var data = {};
+            formData.forEach(function(value, key) {
+                data[key] = value;
+            });
+
+            fetch('/predict', {
+                method: 'POST',
+                body: new URLSearchParams(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById('prediction').innerText = result.prediction === 1 ? 'Fire Detected' : 'No Fire';
+                document.getElementById('result').style.display = 'block';
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
